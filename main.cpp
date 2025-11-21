@@ -1,91 +1,225 @@
 #include <iostream>
-#include <iomanip>
+#include <string>
 
 using namespace std;
 
+enum objectType{ROCK, PAPER, SCISSORS};
+
+void displayRules()
+{
+    cout << "Welcome to the game of Rock, Paper, "
+         << "and Scissors." << endl;
+    cout << "This is a game for two players. For each "
+         << "game, each" << endl;
+    cout << "player selects one of the objects, Rock, "
+         << "Paper or Scissors." << endl;
+    cout << "The rules for winning the game are: " << endl;
+    cout << "1. If both players select the same object, it "
+         << "is a tie." << endl;
+    cout << "2. Rock breaks Scissors: So player who selects "
+         << "Rock wins." << endl;
+    cout << "3. Paper covers Rock: So player who selects "
+         << "Paper wins." << endl;
+    cout << "4. Scissors cut Paper: So player who selects "
+         << "Scissors wins." << endl;
+    cout << "Enter R or r to select Rock, P or p to select "
+         << "Paper, and S or s to select Scissors." << endl;
+}
+
+bool validselection(char selection)
+{
+    switch(selection)
+    {
+        case 'r':
+        case 'R':
+        case 'p':
+        case 'P':
+        case 's':
+        case 'S':
+            return true;
+        default:
+            return false;
+    }
+}
+
+objectType retreivePlay(char selection)
+{
+    objectType object;
+    switch(selection)
+    {
+        case 'r':
+        case 'R':
+            object=ROCK;
+            break;
+        case 'p':
+        case 'P':
+            object=PAPER;
+            break;
+        case 's':
+        case 'S':
+            object=SCISSORS;
+            break;
+    }
+    return object;
+}
+
+void convertenum(objectType object)
+{
+    switch(object)
+    {
+        case ROCK:
+            cout << "Rock";
+            break;
+        case PAPER:
+            cout << "Paper";
+            break;
+        case SCISSORS:
+            cout << "Scissors";
+            break;
+    }
+}
+
+objectType winningObject(objectType play1, objectType play2)
+{
+    if((play1 == ROCK && play2 == SCISSORS) || (play2 == ROCK && play1 == SCISSORS))
+        return ROCK;
+    else if((play1 == ROCK && play2 == PAPER) || (play2 == ROCK && play1 == PAPER))
+        return PAPER;
+    else
+        return SCISSORS;
+}
+
+void gameresult(objectType play1, objectType play2, int &winner)
+{
+    objectType winnerobject;
+    if(play1 == play2)
+    {
+        winner = 0;
+        cout << "Both Players selected ";
+        convertenum(play1);
+        cout << endl;
+        cout << "It is a Tie" << endl;
+    }
+    else
+    {
+        winnerobject = winningObject(play1, play2);
+        cout << "Player 1 selected ";
+        convertenum(play1);
+        cout << endl;
+        cout << "Player 2 selected ";
+        convertenum(play2);
+        cout << endl;
+        if(play1 == winnerobject)
+            winner = 1;
+        else if(play2 == winnerobject)
+            winner = 2;
+        cout << "Player " << winner << " wins this game" << endl;
+    }
+}
+
+void displayresult(int gcount, int wcount1, int wcount2)
+{
+    cout << "The total number of plays: " << gcount << endl;
+    cout << "The number of plays won by player 1: " << wcount1 << endl;
+    cout << "The number of plays won by player 2: " << wcount2 << endl;
+}
+
+bool isVowel(char ch)
+{
+    switch(ch)
+    {
+        case 'a':
+        case 'e':
+        case 'i':
+        case 'o':
+        case 'u':
+        case 'y':
+        case 'A':
+        case 'E':
+        case 'I':
+        case 'O':
+        case 'U':
+        case 'Y':
+            return true;
+            break;
+        default:
+            return false;
+    }
+}
+
+string rotate(string pstr)
+{
+    string::size_type len = pstr.length();
+    string rstr;
+    rstr = pstr.substr(1, len-1) + pstr[0];
+    return rstr;
+}
+
+string pigLatinstring(string pstr)
+{
+    string::size_type len;
+    bool foundVowel;
+    string::size_type counter;
+    if(isVowel(pstr[0]))
+        pstr += "-way";
+    else
+    {
+        pstr += '-';
+        pstr = rotate(pstr);
+        len = pstr.length();
+        foundVowel = false;
+        for(counter = 1; counter < len-1; counter++)
+            if(isVowel(pstr[0]))
+            {
+                foundVowel = true;
+                break;
+            }
+            else
+                pstr = rotate(pstr);
+        if(!foundVowel)
+            pstr = pstr.substr(1,len) + "-way";
+        else
+            pstr = pstr + "ay";
+    }
+    return pstr;
+}
+
+
+
 int main()
 {
-    int array[15],positivecount=0,negativecount=0,oddcount=0,evencount=0,zerocount=0,largest=-999999,smallest=0;
-    for(int i=0;i<15;i++)
+    int gcount=0,wcount1=0,wcount2=0,winner;
+    char selection1,selection2,response;
+    objectType play1,play2;
+    displayRules();
+    cout << "Enter (Y/y) if you want to play: ";
+    cin  >> response;
+    while(response == 'y' || response == 'Y')
     {
-        cout << "Enter an integer: ";
-        cin  >> array[i];
-        if(array[i]>0)
-            positivecount++;
-        if(array[i]<0)
-            negativecount++;
-        if(array[i]%2!=0)
-            oddcount++;
-        if(array[i]%2==0)
-            evencount++;
-        if(array[i]==0)
-            zerocount++;
-        if(array[i]>largest)
-            largest=array[i];
-        if(array[i]<smallest)
-            smallest=array[i];
+        cout << "Player 1 Enter selection: ";
+        cin  >> selection1;
+        cout << "Player 2 Enter selection: ";
+        cin  >> selection2;
+        if(validselection(selection1) && validselection(selection2))
+        {
+            play1=retreivePlay(selection1);
+            play2=retreivePlay(selection2);
+            gcount++;
+            gameresult(play1, play2, winner);
+         if(winner == 1)
+            wcount1++;
+         else if(winner == 2)
+            wcount2++;
+        }
+        cout << "Enter (Y/y) if you want to play: ";
+        cin  >> response;
     }
-    cout << "\nThe positive values are: " << positivecount << endl;
-    cout << "The negative values are: " << negativecount << endl;
-    cout << "The odd values are: " << oddcount << endl;
-    cout << "The even values are: " << evencount << endl;
-    cout << "The zero values are: " << zerocount << endl;
-    cout << "The largest value is: " << largest << endl;
-    cout << "The smallest value is: " << smallest << "\n" << endl;
+    displayresult(gcount,wcount1,wcount2);
 
-    double index[30];
-    for(int i=0;i<30;i++)
-    {
-        if(i<15)
-            index[i]=i*i;
-        else
-            index[i]=3*i;
-    }
-    for(int i=0;i<30;i++)
-    {
-        cout << fixed << setprecision(2) << index[i] << " ";
-        if((i+1)%5==0)
-            cout << endl;
-    }
-    cout << "\n" << endl;
 
-    int arr[5],i,ars[5];
-    for(i=0;i<5;i++)
-    {
-        cout << "Enter an integer: ";
-        cin  >> arr[i];
-    }
-
-    cout << "\nArray 1: ";
-    for(i=0;i<5;i++)
-        cout << arr[i] << " ";
-
-    for(i=0;i<5;i++)
-        ars[i]=arr[4-i];
-
-    cout << "\nArray 2: ";
-    for(i=0;i<5;i++)
-        cout << ars[i] << " ";
-    cout << "\n" << endl;
-
-    int arc[10],num,input,count=0;
-    for(i=0;i<10;i++)
-    {
-        cout << "Input a number: ";
-        cin  >> input;
-        arc[i]=input;
-    }
-    cout << "\nEnter a number: ";
-    cin  >> num;
-    for(int j=0;j<10;j++)
-    {
-        if(arc[j]==num)
-            count++;
-    }
-    if(count>=1)
-        cout << num << " is present in an array" << endl;
-    else
-        cout << num << " is not present in an array" << endl;
-    cout << count << " times " << num << " appear in the array" << endl;
+    string str;
+    cout << "\n\nEnter a string: ";
+    cin  >> str;
+    cout << "The pig Latin form of " << str << " is " << pigLatinstring(str) << endl;
     return 0;
 }
